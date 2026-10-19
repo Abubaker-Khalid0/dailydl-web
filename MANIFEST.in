@@ -1,0 +1,5 @@
+include *.md requirements.lock
+recursive-include docs *.jpg
+recursive-include tests *.py
+recursive-include src/dailydl_web/templates *.html
+recursive-include src/dailydl_web/static *.css *.js *.svg

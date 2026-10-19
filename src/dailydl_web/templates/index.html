@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content="{{ csrf }}" />
+    <meta
+      name="description"
+      content="مساحة بسيطة لتنزيل فيديوهات Dailymotion بالجودة التي تختارها."
+    />
+    <title>DailyDL — مساحة التحميل</title>
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='mark.svg') }}"
+      type="image/svg+xml"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}" />
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#urlInput">انتقل إلى رابط الفيديو</a>
+    <aside class="sidebar">
+      <a class="brand" href="/" aria-label="DailyDL الصفحة الرئيسية"
+        ><span class="brand-mark" aria-hidden="true">d<span>↓</span></span
+        ><span dir="ltr"
+          >DailyDL<span class="brand-sub">VIDEO WORKSPACE</span></span
+        ></a
+      >
+      <div class="sidebar-label">مساحة العمل</div>
+      <div class="nav-current">
+        <span aria-hidden="true">↙</span> تحميل فيديو
+        <span class="nav-dot"></span>
+      </div>
+      <div class="sidebar-note">
+        <span class="mini-label">بسيط. وعلى جهازك.</span>
+        <p>رابط واحد، الجودة المناسبة، وملف جاهز للاحتفاظ به.</p>
+      </div>
+      <div class="sidebar-bottom">
+        <span class="status-dot"></span> يعمل محليًا
+        <span class="version" dir="ltr">v{{ version }}</span>
+      </div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <span>مساحة التحميل <span class="muted">/ Dailymotion</span></span
+        ><span class="private-label"
+          ><span aria-hidden="true">◈</span> جلسة خاصة على جهازك</span
+        >
+      </header>
+      <main>
+        <section class="intro">
+          <div class="eyebrow">
+            <span class="line"></span> قليل من الخطوات. كل ما تحتاجه.
+          </div>
+          <h1>من الرابط إلى الملف<span>.</span></h1>
+          <p>اختر الفيديو، حدّد الجودة، واترك الباقي لنا.</p>
+        </section>
+        <div id="message" class="notice" role="alert" hidden></div>
+        <div id="dependencyNotice" class="notice warning" hidden>
+          يلزم تثبيت FFmpeg وffprobe قبل التحميل. يمكنك استخراج معلومات الفيديو
+          الآن.
+        </div>
+        <section class="card input-card" aria-labelledby="inputTitle">
+          <div class="section-heading">
+            <div>
+              <span class="step">01</span>
+              <h2 id="inputTitle">ابدأ برابط الفيديو</h2>
+            </div>
+            <span class="tag">Dailymotion فقط</span>
+          </div>
+          <form id="extractForm">
+            <label class="sr-only" for="urlInput"
+              >رابط Dailymotion أو معرّف الفيديو</label
+            >
+            <div class="input-row">
+              <input
+                id="urlInput"
+                name="url"
+                type="text"
+                dir="ltr"
+                placeholder="https://www.dailymotion.com/video/..."
+                maxlength="2048"
+                required
+                autocomplete="off"
+                spellcheck="false"
+              /><button id="extractBtn" class="button primary" type="submit">
+                <span>استخراج الفيديو</span><span aria-hidden="true">←</span>
+              </button>
+            </div>
+          </form>
+          <div class="input-caption">
+            <span>يدعم الروابط المختصرة ومعرّف الفيديو.</span
+            ><span class="engine-status" id="engineStatus"
+              >جارٍ التحقق من الجاهزية…</span
+            >
+          </div>
+        </section>
+        <section
+          id="results"
+          class="results"
+          aria-label="تفاصيل الفيديو وخيارات التحميل"
+          hidden
+        >
+          <div class="video-preview">
+            <img id="thumbnail" alt="صورة مصغرة للفيديو" hidden />
+            <div>
+              <div class="eyebrow small">جاهز للاختيار</div>
+              <h2 id="videoTitle"></h2>
+              <div class="video-meta">
+                <span id="channel"></span><span aria-hidden="true">·</span
+                ><span id="duration"></span
+                ><a id="sourceLink" target="_blank" rel="noopener noreferrer"
+                  >عرض المصدر ↗</a
+                >
+              </div>
+            </div>
+          </div>
+          <section class="card" aria-labelledby="qualityTitle">
+            <div class="section-heading">
+              <div>
+                <span class="step">02</span>
+                <h2 id="qualityTitle">الجودة والتفاصيل</h2>
+              </div>
+              <span class="tag" id="qualityCount"></span>
+            </div>
+            <fieldset class="quality-fieldset">
+              <legend class="sr-only">اختر جودة الفيديو</legend>
+              <div id="qualityGrid" class="quality-grid"></div>
+            </fieldset>
+            <div class="extras">
+              <label class="check-row"
+                ><input id="metadata" type="checkbox" /><span
+                  ><strong>إرفاق معلومات الفيديو</strong
+                  ><small>العنوان والمصدر والجودة في ملف JSON</small></span
+                ></label
+              >
+              <div id="subtitleControl">
+                <label class="check-row"
+                  ><input id="subtitles" type="checkbox" /><span
+                    ><strong>إرفاق الترجمة</strong
+                    ><small id="subtitleHint"
+                      >الترجمات المتاحة مع الفيديو</small
+                    ></span
+                  ></label
+                ><label id="languageLabel" for="language" class="sr-only"
+                  >لغة الترجمة</label
+                ><select id="language" disabled aria-labelledby="languageLabel">
+                  <option value="all">كل اللغات المتاحة</option>
+                </select>
+              </div>
+            </div>
+            <p class="bundle-note" id="bundleNote">ستحصل على ملف فيديو MP4.</p>
+            <div class="download-row">
+              <button id="downloadBtn" class="button primary" type="button">
+                تحضير التحميل <span aria-hidden="true">↓</span></button
+              ><span>ملفات مؤقتة خاصة بكل عملية</span>
+            </div>
+          </section>
+        </section>
+        <section
+          id="jobPanel"
+          class="card job-panel"
+          aria-labelledby="jobHeading"
+          hidden
+        >
+          <div class="section-heading">
+            <div>
+              <span class="step">03</span>
+              <h2 id="jobHeading">جارٍ تحضير ملفك</h2>
+            </div>
+            <span id="percentage" class="percentage" dir="ltr">—</span>
+          </div>
+          <progress
+            id="progress"
+            max="100"
+            aria-label="تقدم تحميل الفيديو"
+          ></progress>
+          <div class="progress-details">
+            <span id="stage" role="status" aria-live="polite"
+              >جارٍ استخراج الفيديو…</span
+            ><span id="transfer" dir="ltr"></span>
+          </div>
+          <div id="jobWarnings" class="job-warnings" hidden></div>
+          <div class="job-actions">
+            <button id="cancelBtn" class="button subtle" type="button">
+              إلغاء العملية</button
+            ><a id="saveBtn" class="button primary" hidden
+              >حفظ الملف على الجهاز ↓</a
+            >
+          </div>
+        </section>
+        <section id="emptyState" class="empty-state">
+          <span class="empty-icon" aria-hidden="true">↓</span>
+          <div>
+            <h2>فيديوك التالي يبدأ هنا</h2>
+            <p>ألصق الرابط بالأعلى لعرض الجودات والترجمات المتاحة.</p>
+          </div>
+          <div class="format-stamp" dir="ltr">
+            MP4<br /><span>+ SUBTITLES</span>
+          </div>
+        </section>
+        <footer>
+          <span
+            >DailyDL <span class="footer-dot">·</span> صُمّم ليبقى بسيطًا</span
+          ><span>نزّل المحتوى الذي تملك حق تنزيله.</span>
+        </footer>
+      </main>
+    </div>
+  </body>
+</html>
