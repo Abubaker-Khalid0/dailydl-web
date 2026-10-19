@@ -111,10 +111,6 @@ tests/
 
 Provider changes can affect extraction. Update `yt-dlp[curl-cffi]`, rerun the tests and verify a live download before refreshing `requirements.lock`.
 
-## تشغيل سريع بالعربية
-
-أنشئ بيئة Python وثبّت المشروع، ثم شغّل `dailydl-web` وافتح `http://127.0.0.1:5000`. الواجهة تعمل محليًا؛ ليست إضافة للمتصفح. حدّد الجودة والترجمة، وانتظر اكتمال التحضير ثم احفظ الملف. عند طلب الترجمة أو البيانات الوصفية، تُجمع الملفات المتاحة داخل ZIP.
-
 ## License and attribution
 
 Application code is MIT licensed. Dependencies keep their own licenses; see [THIRD_PARTY.md](THIRD_PARTY.md). Not affiliated with Dailymotion. Download only content you are authorized to save. Live, private, password-protected and DRM-protected videos are not supported by this application's workflow.
